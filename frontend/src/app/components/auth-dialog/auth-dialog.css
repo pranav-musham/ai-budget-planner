@@ -1,0 +1,106 @@
+.auth-dialog {
+  min-width: 450px;
+  max-width: 500px;
+}
+
+.dialog-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.dialog-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+.close-button {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+}
+
+mat-dialog-content {
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.auth-tabs {
+  width: 100%;
+}
+
+.tab-content {
+  padding: 2rem 1.5rem;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background-color: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+}
+
+.error-message mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.submit-button {
+  margin-top: 0.5rem;
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.submit-button mat-spinner {
+  margin-right: 0.5rem;
+}
+
+/* Material Tab Customization */
+::ng-deep .auth-tabs .mat-mdc-tab-labels {
+  justify-content: space-around;
+}
+
+::ng-deep .auth-tabs .mat-mdc-tab {
+  min-width: 120px;
+  font-weight: 600;
+}
+
+::ng-deep .auth-tabs .mat-mdc-tab-body-content {
+  overflow: hidden;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .auth-dialog {
+    min-width: 100%;
+    max-width: 100%;
+  }
+
+  .dialog-header {
+    padding: 1rem;
+  }
+
+  .tab-content {
+    padding: 1.5rem 1rem;
+  }
+}

@@ -1,0 +1,98 @@
+<div class="receipt-list-container">
+  <div class="header">
+    <h1>My Transactions</h1>
+    <div class="actions">
+      <button mat-raised-button color="primary" (click)="addExpense()">
+        <mat-icon>add_circle</mat-icon>
+        Enter Expense
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <mat-spinner></mat-spinner>
+  </div>
+
+  <div *ngIf="!loading && transactions.length === 0" class="empty-state">
+    <mat-icon class="empty-icon">receipt_long</mat-icon>
+    <h2>No transactions yet</h2>
+    <p>Scan a receipt or add a transaction manually to get started</p>
+  </div>
+
+  <!-- Monthly Grouped Transactions -->
+  <div *ngIf="!loading && monthGroups.length > 0" class="month-groups">
+    <div *ngFor="let group of monthGroups" class="month-section">
+
+      <!-- Month Header (clickable to collapse/expand) -->
+      <div class="month-header" (click)="toggleMonth(group.key)">
+        <div class="month-header-left">
+          <mat-icon class="collapse-icon" [class.collapsed]="isCollapsed(group.key)">expand_more</mat-icon>
+          <div class="month-label">
+            <h2>{{ group.label }}</h2>
+            <span class="month-count">{{ group.transactions.length }} transaction{{ group.transactions.length !== 1 ? 's' : '' }}</span>
+          </div>
+        </div>
+        <div class="month-total">
+          <span class="total-label">Total Spent</span>
+          <span class="total-amount">${{ group.total | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Expandable Content -->
+      <div class="month-content" [class.collapsed]="isCollapsed(group.key)">
+
+        <!-- Category Breakdown Summary -->
+        <div class="category-summary">
+          <div *ngFor="let cat of group.categoryBreakdown" class="category-pill"
+               [style.border-left-color]="getCategoryColor(cat.category)">
+            <mat-icon class="category-pill-icon" [style.color]="getCategoryColor(cat.category)">
+              {{ getCategoryIcon(cat.category) }}
+            </mat-icon>
+            <div class="category-pill-info">
+              <span class="category-pill-name">{{ cat.category }}</span>
+              <span class="category-pill-amount">${{ cat.amount | number:'1.2-2' }}</span>
+            </div>
+            <span class="category-pill-pct">{{ cat.percentage | number:'1.0-0' }}%</span>
+          </div>
+        </div>
+
+        <!-- Transactions Table -->
+        <div class="transactions-table-wrapper">
+          <table class="transactions-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Merchant</th>
+                <th>Category</th>
+                <th class="text-right">Amount</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let txn of group.transactions" class="transaction-row" (click)="viewTransaction(txn.id)">
+                <td class="date-cell">{{ txn.transactionDate | date:'MMM d' }}</td>
+                <td class="merchant-cell">
+                  {{ txn.merchantName }}
+                  <span *ngIf="txn.isManualEntry" class="manual-badge">Manual</span>
+                </td>
+                <td class="category-cell">
+                  <span class="category-tag" [style.background-color]="getCategoryColor(txn.category) + '18'"
+                        [style.color]="getCategoryColor(txn.category)">
+                    <mat-icon class="category-tag-icon">{{ getCategoryIcon(txn.category) }}</mat-icon>
+                    {{ txn.category }}
+                  </span>
+                </td>
+                <td class="amount-cell">${{ txn.amount | number:'1.2-2' }}</td>
+                <td class="actions-cell">
+                  <button mat-icon-button (click)="deleteTransaction($event, txn.id)" matTooltip="Delete">
+                    <mat-icon>delete_outline</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

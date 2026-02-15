@@ -1,0 +1,72 @@
+<!-- Floating Chat FAB -->
+<button class="chat-fab" (click)="toggleChat()" matTooltip="FinBot">
+  <mat-icon>{{ isOpen ? 'close' : 'smart_toy' }}</mat-icon>
+</button>
+
+<!-- Chat Window -->
+<div class="chat-window" *ngIf="isOpen">
+  <!-- Header -->
+  <div class="chat-header">
+    <div class="chat-title">
+      <mat-icon>smart_toy</mat-icon>
+      <span>FinBot</span>
+    </div>
+    <div class="header-actions">
+      <button mat-icon-button (click)="clearHistory()" matTooltip="Clear history" [disabled]="messages.length === 0">
+        <mat-icon>delete_sweep</mat-icon>
+      </button>
+      <button mat-icon-button (click)="toggleChat()" matTooltip="Close">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Chat Body -->
+  <div class="chat-body">
+    <!-- Empty state -->
+    <div *ngIf="messages.length === 0 && !isLoading" class="empty-state">
+      <mat-icon class="empty-icon">chat_bubble_outline</mat-icon>
+      <p class="empty-text">Hi, I'm FinBot! Ask me about your spending or budgets.</p>
+      <div class="suggested-questions">
+        <button
+          *ngFor="let question of suggestedQuestions"
+          class="suggestion-chip"
+          (click)="sendSuggestedQuestion(question)">
+          {{ question }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Messages -->
+    <div #chatContainer class="chat-messages" *ngIf="messages.length > 0">
+      <div *ngFor="let message of messages" class="message-wrapper" [ngClass]="message.type">
+        <div class="message-bubble" [ngClass]="message.type">
+          <div class="message-content">{{ message.content }}</div>
+          <div class="message-time">{{ formatTime(message.timestamp) }}</div>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoading" class="message-wrapper ai">
+        <div class="message-bubble ai loading">
+          <mat-spinner diameter="16"></mat-spinner>
+          <span>Thinking...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Input -->
+  <div class="chat-input">
+    <input
+      type="text"
+      [(ngModel)]="userInput"
+      (keydown)="onEnterPress($event)"
+      [disabled]="isLoading"
+      placeholder="Type a message..."
+      autocomplete="off" />
+    <button class="send-btn" (click)="sendMessage()" [disabled]="!userInput.trim() || isLoading">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+</div>

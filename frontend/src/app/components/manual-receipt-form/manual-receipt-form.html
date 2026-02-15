@@ -1,0 +1,406 @@
+<div class="form-container">
+  <h2>Enter Expense</h2>
+
+  <mat-tab-group animationDuration="200ms">
+    <!-- Tab 1: Upload Bill -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">cloud_upload</mat-icon>
+        Upload Bill
+      </ng-template>
+
+      <!-- Upload Section -->
+      <div *ngIf="processedTransactions.length === 0" class="upload-tab-content">
+        <mat-card>
+          <mat-card-content>
+            <!-- Drag & Drop Zone -->
+            <div
+              class="drop-zone"
+              [class.dragging]="isDragging"
+              [class.has-files]="selectedFiles.length > 0"
+              (dragover)="onDragOver($event)"
+              (dragleave)="onDragLeave($event)"
+              (drop)="onDrop($event)"
+            >
+              <mat-icon class="upload-icon">cloud_upload</mat-icon>
+
+              <div *ngIf="selectedFiles.length === 0">
+                <p class="drop-text">Drag and drop receipt images here</p>
+                <p class="or-text">or</p>
+                <input
+                  #fileInput
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  (change)="onFileSelected($event)"
+                  style="display: none"
+                />
+                <button mat-raised-button color="primary" (click)="triggerFileInput()">
+                  <mat-icon>folder_open</mat-icon>
+                  Browse Files
+                </button>
+                <p class="file-info">Supported formats: JPEG, PNG, GIF (Max 10MB each)</p>
+                <p class="file-info">You can select multiple files at once</p>
+              </div>
+
+              <!-- Multiple Image Previews -->
+              <div *ngIf="selectedFiles.length > 0" class="preview-grid">
+                <div class="preview-item" *ngFor="let preview of imagePreviews">
+                  <img [src]="preview.preview" alt="Receipt preview" class="preview-image-small" />
+                  <div class="preview-info">
+                    <p class="file-name">{{ preview.file.name }}</p>
+                    <p class="file-size">{{ (preview.file.size / 1024 / 1024).toFixed(2) }} MB</p>
+                  </div>
+                  <button mat-icon-button (click)="removeFile(preview.file)" color="warn">
+                    <mat-icon>close</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Add More Button -->
+              <div *ngIf="selectedFiles.length > 0 && !isUploading" class="add-more-section">
+                <button mat-stroked-button (click)="triggerFileInput()">
+                  <mat-icon>add</mat-icon>
+                  Add More Files
+                </button>
+                <p class="file-count">{{ selectedFiles.length }} file(s) selected</p>
+              </div>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="uploadError" class="error-message">
+              <mat-icon>error</mat-icon>
+              <span>{{ uploadError }}</span>
+            </div>
+
+            <!-- Action Buttons -->
+            <div *ngIf="selectedFiles.length > 0 && !isUploading" class="upload-actions">
+              <button mat-raised-button color="primary" (click)="uploadReceipt()" [disabled]="isUploading">
+                <mat-icon>send</mat-icon>
+                Process {{ selectedFiles.length }} Receipt(s)
+              </button>
+              <button mat-button (click)="clearUpload()" [disabled]="isUploading">
+                <mat-icon>clear</mat-icon>
+                Clear All
+              </button>
+            </div>
+
+            <!-- Loading Progress -->
+            <div *ngIf="isUploading" class="loading-section">
+              <h3>Processing Receipts...</h3>
+              <div class="progress-list">
+                <div class="progress-item" *ngFor="let file of selectedFiles">
+                  <div class="progress-header">
+                    <mat-icon [color]="getProgressColor(uploadProgress[file.name])">
+                      {{ getProgressIcon(uploadProgress[file.name]) }}
+                    </mat-icon>
+                    <span class="progress-filename">{{ file.name }}</span>
+                  </div>
+                  <mat-progress-bar
+                    *ngIf="uploadProgress[file.name] >= 0"
+                    mode="indeterminate"
+                    [color]="getProgressColor(uploadProgress[file.name])"
+                  ></mat-progress-bar>
+                  <div *ngIf="uploadProgress[file.name] === -1" class="error-text">
+                    Failed to process
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Results / Review Section -->
+      <div *ngIf="processedTransactions.length > 0" class="results-container">
+        <mat-card class="results-card">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon class="success-icon">check_circle</mat-icon>
+              Review {{ processedTransactions.length }} Receipt(s)
+            </mat-card-title>
+          </mat-card-header>
+
+          <mat-card-content>
+            <!-- Summary Stats -->
+            <div class="summary-stats">
+              <div class="stat-item">
+                <mat-icon>receipt</mat-icon>
+                <span>{{ processedTransactions.length }} receipts</span>
+              </div>
+              <div class="stat-item">
+                <mat-icon>attach_money</mat-icon>
+                <span>${{ getTotalAmount().toFixed(2) }} total</span>
+              </div>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Receipt Review List -->
+            <div class="receipt-review-list">
+              <mat-card
+                class="receipt-item"
+                *ngFor="let receipt of processedTransactions; let i = index"
+                [class.needs-review]="receipt.needsReview"
+              >
+                <mat-card-content>
+                  <!-- Warning banner for low confidence -->
+                  <div *ngIf="receipt.needsReview" class="review-warning">
+                    <mat-icon>warning</mat-icon>
+                    <span>
+                      Low confidence
+                      <span *ngIf="receipt.confidenceScore">
+                        ({{ (receipt.confidenceScore * 100).toFixed(0) }}%)
+                      </span>
+                      — please review and correct the values below
+                    </span>
+                  </div>
+
+                  <!-- View Mode -->
+                  <div *ngIf="editingIndex !== i">
+                    <div class="receipt-summary-row">
+                      <div>
+                        <div class="merchant-name">{{ receipt.merchantName }}</div>
+                        <div class="receipt-meta">
+                          {{ receipt.transactionDate | date:'mediumDate' }} •
+                          <mat-chip>{{ receipt.category }}</mat-chip>
+                        </div>
+                      </div>
+                      <div class="receipt-view-right">
+                        <div class="receipt-amount" [class.zero-amount]="receipt.amount === 0">
+                          ${{ receipt.amount.toFixed(2) }}
+                        </div>
+                        <button mat-stroked-button color="primary" (click)="startEdit(i)">
+                          <mat-icon>edit</mat-icon>
+                          Edit
+                        </button>
+                      </div>
+                    </div>
+
+                    <div *ngIf="receipt.items && receipt.items.length > 0" class="items-preview">
+                      <span class="items-count">{{ receipt.items.length }} item(s)</span>
+                    </div>
+                  </div>
+
+                  <!-- Edit Mode -->
+                  <div *ngIf="editingIndex === i" class="edit-form">
+                    <h4>Edit Transaction</h4>
+
+                    <div class="edit-fields">
+                      <mat-form-field appearance="outline">
+                        <mat-label>Merchant Name</mat-label>
+                        <input matInput [(ngModel)]="editForm.merchantName" />
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Amount ($)</mat-label>
+                        <input matInput type="number" step="0.01" [(ngModel)]="editForm.amount" />
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Date</mat-label>
+                        <input matInput type="date" [(ngModel)]="editForm.transactionDate" />
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>Category</mat-label>
+                        <mat-select [(ngModel)]="editForm.category">
+                          <mat-option *ngFor="let cat of uploadCategories" [value]="cat">
+                            {{ cat }}
+                          </mat-option>
+                        </mat-select>
+                      </mat-form-field>
+                    </div>
+
+                    <!-- Line Items Editor -->
+                    <div class="edit-items-section">
+                      <div class="edit-items-header">
+                        <h5>Line Items</h5>
+                        <button mat-stroked-button (click)="addEditItem()">
+                          <mat-icon>add</mat-icon>
+                          Add Item
+                        </button>
+                      </div>
+
+                      <div *ngIf="editForm.items.length > 0" class="edit-items-list">
+                        <div class="edit-item-row" *ngFor="let item of editForm.items; let j = index">
+                          <mat-form-field appearance="outline" class="item-name-field">
+                            <mat-label>Item Name</mat-label>
+                            <input matInput [(ngModel)]="item.name" />
+                          </mat-form-field>
+                          <mat-form-field appearance="outline" class="item-qty-field">
+                            <mat-label>Qty</mat-label>
+                            <input matInput type="number" [(ngModel)]="item.quantity" (ngModelChange)="updateItemPrice(j)" />
+                          </mat-form-field>
+                          <mat-form-field appearance="outline" class="item-price-field">
+                            <mat-label>Price ($)</mat-label>
+                            <input matInput type="number" step="0.01" [(ngModel)]="item.price" />
+                          </mat-form-field>
+                          <button mat-icon-button color="warn" (click)="removeEditItem(j)">
+                            <mat-icon>delete</mat-icon>
+                          </button>
+                        </div>
+                      </div>
+
+                      <div *ngIf="editForm.items.length === 0" class="no-items-text">
+                        No line items. Click "Add Item" to add one.
+                      </div>
+                    </div>
+
+                    <!-- Edit Actions -->
+                    <div class="edit-actions">
+                      <button mat-raised-button color="primary" (click)="saveEdit()" [disabled]="isSaving">
+                        <mat-icon>save</mat-icon>
+                        {{ isSaving ? 'Saving...' : 'Save Changes' }}
+                      </button>
+                      <button mat-button (click)="cancelEdit()" [disabled]="isSaving">
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                </mat-card-content>
+              </mat-card>
+            </div>
+
+            <!-- Error Message -->
+            <div *ngIf="uploadError" class="error-message" style="margin-top: 1rem;">
+              <mat-icon>error</mat-icon>
+              <span>{{ uploadError }}</span>
+            </div>
+
+            <mat-divider></mat-divider>
+
+            <!-- Final Actions -->
+            <div class="result-actions">
+              <button mat-raised-button color="primary" (click)="confirmAll()">
+                <mat-icon>done_all</mat-icon>
+                Confirm All &amp; View Transactions
+              </button>
+              <button mat-button (click)="clearUpload()">
+                <mat-icon>add</mat-icon>
+                Upload More
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Tab 2: Enter Manually -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">edit_note</mat-icon>
+        Enter Manually
+      </ng-template>
+
+      <form [formGroup]="transactionForm" (ngSubmit)="onSubmit()">
+        <mat-card>
+          <mat-card-content>
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Merchant Name</mat-label>
+                <input matInput formControlName="merchantName" placeholder="e.g., Whole Foods">
+                <mat-error *ngIf="transactionForm.get('merchantName')?.hasError('required')">
+                  Merchant name is required
+                </mat-error>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" style="flex: 1;">
+                <mat-label>Amount</mat-label>
+                <input matInput type="number" formControlName="amount" placeholder="0.00">
+                <span matTextPrefix>$&nbsp;</span>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" style="flex: 1;">
+                <mat-label>Date</mat-label>
+                <input matInput [matDatepicker]="picker" formControlName="transactionDate">
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-datepicker #picker></mat-datepicker>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" style="flex: 1;">
+                <mat-label>Category</mat-label>
+                <mat-select formControlName="category">
+                  <mat-option *ngFor="let cat of categories" [value]="cat.name">
+                    {{ cat.name }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" style="flex: 1;">
+                <mat-label>Payment Method</mat-label>
+                <mat-select formControlName="paymentMethod">
+                  <mat-option value="">-- Select --</mat-option>
+                  <mat-option *ngFor="let method of paymentMethods" [value]="method">
+                    {{ method }}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </div>
+
+            <div class="form-row">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Notes (optional)</mat-label>
+                <textarea matInput formControlName="notes" rows="2" placeholder="Add any notes..."></textarea>
+              </mat-form-field>
+            </div>
+
+            <div class="items-section">
+              <div class="section-header">
+                <h3>Line Items</h3>
+                <button mat-raised-button type="button" color="accent" (click)="addItem()">
+                  <mat-icon>add</mat-icon>
+                  Add Item
+                </button>
+              </div>
+
+              <div formArrayName="items" *ngIf="items.length > 0">
+                <div *ngFor="let item of items.controls; let i = index" [formGroupName]="i" class="item-row">
+                  <mat-form-field appearance="outline" style="flex: 2;">
+                    <mat-label>Item Name</mat-label>
+                    <input matInput formControlName="name" placeholder="e.g., Milk">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" style="flex: 1;">
+                    <mat-label>Qty</mat-label>
+                    <input matInput type="number" formControlName="quantity">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" style="flex: 1;">
+                    <mat-label>Unit Price</mat-label>
+                    <input matInput type="number" formControlName="unitPrice">
+                    <span matTextPrefix>$&nbsp;</span>
+                  </mat-form-field>
+
+                  <div class="item-total">
+                    <span class="label">Total:</span>
+                    <span class="amount">${{ calculateItemTotal(i).toFixed(2) }}</span>
+                  </div>
+
+                  <button mat-icon-button type="button" color="warn" (click)="removeItem(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <div class="calculated-total" *ngIf="items.length > 0">
+                <strong>Calculated Total: ${{ calculateTotal().toFixed(2) }}</strong>
+              </div>
+            </div>
+          </mat-card-content>
+
+          <mat-card-actions>
+            <button mat-button type="button" (click)="cancel()">Cancel</button>
+            <button mat-raised-button color="primary" type="submit" [disabled]="!transactionForm.valid || submitting">
+              {{ submitting ? 'Saving...' : 'Save Transaction' }}
+            </button>
+          </mat-card-actions>
+        </mat-card>
+      </form>
+    </mat-tab>
+  </mat-tab-group>
+</div>

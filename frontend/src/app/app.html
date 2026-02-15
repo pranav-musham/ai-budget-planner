@@ -1,0 +1,44 @@
+<!-- Only show toolbar when authenticated -->
+<mat-toolbar color="primary" *ngIf="showToolbar">
+  <span>{{ title }}</span>
+  <span class="spacer"></span>
+
+  <button mat-button routerLink="/dashboard">
+    <mat-icon>dashboard</mat-icon>
+    Dashboard
+  </button>
+  <button mat-button routerLink="/transactions">
+    <mat-icon>receipt_long</mat-icon>
+    Transactions
+  </button>
+  <button mat-button routerLink="/transactions/create">
+    <mat-icon>add_circle</mat-icon>
+    Enter Expense
+  </button>
+  <button mat-button routerLink="/income">
+    <mat-icon>trending_up</mat-icon>
+    Income
+  </button>
+  <!-- User menu -->
+  <button mat-icon-button [matMenuTriggerFor]="userMenu">
+    <mat-icon>account_circle</mat-icon>
+  </button>
+  <mat-menu #userMenu="matMenu">
+    <div class="user-info" mat-menu-item disabled>
+      <mat-icon>person</mat-icon>
+      <span>{{ authService.currentUserValue?.email }}</span>
+    </div>
+    <mat-divider></mat-divider>
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>logout</mat-icon>
+      <span>Logout</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Floating AI Chat Widget -->
+<app-ai-chat *ngIf="showToolbar"></app-ai-chat>

@@ -1,0 +1,432 @@
+.dashboard-container {
+  padding: 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.header-actions button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 1rem;
+}
+
+/* Summary Cards */
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.summary-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+}
+
+.summary-card mat-card-content {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  padding: 1.5rem !important;
+}
+
+.card-icon {
+  flex-shrink: 0;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-icon mat-icon {
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  color: white;
+}
+
+.total-spending .card-icon {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.total-income .card-icon {
+  background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+}
+
+.avg-spending .card-icon {
+  background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+}
+
+.card-info {
+  flex: 1;
+}
+
+.card-info h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #6b7280;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-info .amount {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+  color: #1f2937;
+}
+
+.card-info .subtitle {
+  font-size: 0.875rem;
+  color: #9ca3af;
+}
+
+/* Charts Section */
+.charts-section {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.chart-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.chart-card mat-card-header {
+  padding: 1.5rem 1.5rem 0;
+}
+
+.chart-card mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.chart-card mat-card-title mat-icon {
+  color: #667eea;
+}
+
+.chart-card mat-card-subtitle {
+  margin-top: 0.25rem;
+  color: #6b7280;
+}
+
+.chart-container {
+  min-height: 300px;
+  width: 100%;
+  padding: 1rem 0;
+}
+
+.chart-container.pie-chart {
+  min-height: 350px;
+}
+
+.empty-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: #9ca3af;
+  gap: 1rem;
+}
+
+.empty-chart mat-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  opacity: 0.5;
+}
+
+.empty-chart p {
+  font-size: 1rem;
+  margin: 0;
+}
+
+/* Category Legend */
+.category-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+}
+
+.legend-color {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+.legend-label {
+  flex: 1;
+  font-weight: 500;
+  color: #374151;
+}
+
+.legend-value {
+  font-weight: 600;
+  color: #6b7280;
+}
+
+/* Total Savings Card */
+.total-savings .card-icon {
+  background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+}
+
+.total-savings.negative-savings .card-icon {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.card-info .amount.negative {
+  color: #ef4444;
+}
+
+/* Savings Legend */
+.savings-legend {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.savings-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+}
+
+.savings-legend .legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+}
+
+.savings-legend .legend-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Category-Merchant Statistics */
+.category-merchant-section {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.category-merchant-section h2 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.category-merchant-section h2 mat-icon {
+  color: #667eea;
+}
+
+.merchant-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+}
+
+.cat-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.cat-total {
+  font-weight: 700;
+  color: #667eea;
+  margin-left: auto;
+}
+
+.merchant-list {
+  padding: 0.5rem 0;
+}
+
+.merchant-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.15s;
+}
+
+.merchant-row:last-child {
+  border-bottom: none;
+}
+
+.merchant-row:hover {
+  background: #f9fafb;
+}
+
+.merchant-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.merchant-icon {
+  color: #9ca3af;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.merchant-name {
+  font-weight: 500;
+  color: #374151;
+}
+
+.merchant-stats {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.merchant-count {
+  font-size: 0.85rem;
+  color: #9ca3af;
+}
+
+.merchant-amount {
+  font-weight: 600;
+  color: #667eea;
+  font-size: 1rem;
+}
+
+/* Quick Actions */
+.quick-actions {
+  margin-top: 2rem;
+}
+
+.quick-actions h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.action-buttons button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* D3 Chart Styles */
+:host ::ng-deep svg {
+  font-family: 'Roboto', sans-serif;
+}
+
+:host ::ng-deep .bar:hover,
+:host ::ng-deep .dot:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+:host ::ng-deep .arc path:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .charts-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+
+  .dashboard-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .summary-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .merchant-stats {
+    gap: 0.75rem;
+  }
+
+  .savings-legend {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .action-buttons button {
+    width: 100%;
+  }
+}

@@ -1,0 +1,32 @@
+.spacer {
+  flex: 1 1 auto;
+}
+
+.main-content {
+  min-height: 100vh;
+}
+
+mat-toolbar + .main-content {
+  min-height: calc(100vh - 64px);
+}
+
+mat-toolbar button {
+  margin-left: 8px;
+}
+
+mat-toolbar button mat-icon {
+  margin-right: 4px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  color: #666;
+  font-weight: 500;
+}
+
+.user-info mat-icon {
+  color: #3f51b5;
+}

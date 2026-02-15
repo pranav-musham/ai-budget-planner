@@ -1,0 +1,375 @@
+.receipt-list-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Loading & Empty State */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #ccc;
+  margin-bottom: 16px;
+}
+
+/* Month Groups */
+.month-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.month-section {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  border: 1px solid #e8eaf0;
+}
+
+/* Month Header */
+.month-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 24px;
+  cursor: pointer;
+  user-select: none;
+  background: linear-gradient(135deg, #f8f9fc 0%, #eef1f7 100%);
+  transition: background 0.2s;
+}
+
+.month-header:hover {
+  background: linear-gradient(135deg, #eef1f7 0%, #e3e7f0 100%);
+}
+
+.month-header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.collapse-icon {
+  transition: transform 0.3s ease;
+  color: #666;
+}
+
+.collapse-icon.collapsed {
+  transform: rotate(-90deg);
+}
+
+.month-label h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.month-count {
+  font-size: 13px;
+  color: #888;
+}
+
+.month-total {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.total-label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.total-amount {
+  font-size: 24px;
+  font-weight: 700;
+  color: #1976d2;
+}
+
+/* Expandable Content */
+.month-content {
+  max-height: 2000px;
+  overflow: hidden;
+  transition: max-height 0.4s ease, opacity 0.3s ease;
+  opacity: 1;
+}
+
+.month-content.collapsed {
+  max-height: 0;
+  opacity: 0;
+}
+
+/* Category Summary */
+.category-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 16px 24px;
+  background: #fafbfd;
+  border-bottom: 1px solid #eee;
+}
+
+.category-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  background: #fff;
+  border-radius: 8px;
+  border: 1px solid #e8eaf0;
+  border-left-width: 4px;
+  font-size: 13px;
+  min-width: 140px;
+}
+
+.category-pill-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.category-pill-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.category-pill-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.category-pill-amount {
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 14px;
+}
+
+.category-pill-pct {
+  font-size: 12px;
+  color: #999;
+  margin-left: auto;
+  font-weight: 500;
+}
+
+/* Transactions Table */
+.transactions-table-wrapper {
+  overflow-x: auto;
+}
+
+.transactions-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transactions-table thead th {
+  padding: 12px 24px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 600;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #eee;
+  background: #fafbfd;
+}
+
+.transactions-table thead th.text-right {
+  text-align: right;
+}
+
+.transactions-table thead th.text-center {
+  text-align: center;
+}
+
+.transaction-row {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.transaction-row:hover {
+  background: #f5f7fa;
+}
+
+.transaction-row td {
+  padding: 14px 24px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 14px;
+  color: #333;
+  vertical-align: middle;
+}
+
+.transaction-row:last-child td {
+  border-bottom: none;
+}
+
+.date-cell {
+  color: #666;
+  white-space: nowrap;
+  width: 80px;
+}
+
+.merchant-cell {
+  font-weight: 500;
+}
+
+.manual-badge {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: #fff3e0;
+  color: #e65100;
+  margin-left: 8px;
+  vertical-align: middle;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.category-cell {
+  width: 150px;
+}
+
+.category-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.category-tag-icon {
+  font-size: 14px;
+  width: 14px;
+  height: 14px;
+}
+
+.amount-cell {
+  text-align: right;
+  font-weight: 600;
+  color: #1a1a2e;
+  font-size: 15px;
+  white-space: nowrap;
+}
+
+.actions-cell {
+  text-align: center;
+  width: 60px;
+}
+
+.actions-cell button {
+  opacity: 0.5;
+  transition: opacity 0.2s;
+}
+
+.transaction-row:hover .actions-cell button {
+  opacity: 1;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .month-header {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+    padding: 14px 16px;
+  }
+
+  .month-total {
+    align-items: flex-start;
+  }
+
+  .total-amount {
+    font-size: 20px;
+  }
+
+  .category-summary {
+    padding: 12px 16px;
+  }
+
+  .category-pill {
+    min-width: auto;
+    flex: 1 1 calc(50% - 10px);
+  }
+
+  .transactions-table thead th,
+  .transaction-row td {
+    padding: 10px 12px;
+  }
+
+  .transactions-table thead th:nth-child(3),
+  .transaction-row td:nth-child(3) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .receipt-list-container {
+    padding: 12px;
+  }
+
+  .header h1 {
+    font-size: 22px;
+  }
+
+  .category-pill {
+    flex: 1 1 100%;
+  }
+
+  .transactions-table thead th:nth-child(5),
+  .transaction-row td:nth-child(5) {
+    display: none;
+  }
+}

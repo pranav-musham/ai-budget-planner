@@ -1,0 +1,250 @@
+<!-- Public Navbar -->
+<mat-toolbar class="navbar-public">
+  <div class="navbar-container">
+    <div class="logo-section">
+      <mat-icon class="logo-icon">account_balance_wallet</mat-icon>
+      <span class="logo-text">Budget Planner</span>
+    </div>
+    <div class="nav-actions">
+      <button mat-button (click)="navigateToLogin()" class="nav-btn">Login</button>
+      <button mat-raised-button (click)="navigateToRegister()" class="nav-btn-primary">
+        Get Started
+      </button>
+    </div>
+  </div>
+</mat-toolbar>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="container hero-content">
+    <div class="hero-text slide-up">
+      <h1 class="hero-title">Smart Budget Tracking <br><span class="text-gradient">Made Simple</span></h1>
+      <p class="hero-subtitle">
+        Upload receipts, track spending, and stay on budget with AI-powered insights.
+        Your personal finance assistant that works for you.
+      </p>
+      <div class="hero-actions">
+        <button mat-raised-button class="btn-hero-primary" (click)="navigateToRegister()">
+          <mat-icon>rocket_launch</mat-icon>
+          Get Started Free
+        </button>
+        <button mat-stroked-button class="btn-hero-secondary" (click)="scrollToSection('features')">
+          <mat-icon>explore</mat-icon>
+          See Features
+        </button>
+      </div>
+      <p class="hero-note">No credit card required &bull; Free to start &bull; Cancel anytime</p>
+    </div>
+    <div class="hero-visual scale-in">
+      <div class="hero-card">
+        <mat-icon class="hero-card-icon">insights</mat-icon>
+        <div class="hero-card-content">
+          <div class="stat-row">
+            <span class="stat-label">Monthly Spending</span>
+            <span class="stat-value">$2,458</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">Budget Remaining</span>
+            <span class="stat-value success">$542</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 82%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about-section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">What is Budget Planner?</h2>
+      <p class="section-subtitle">
+        Your digital solution for effortless expense tracking and smart budget management
+      </p>
+    </div>
+    <div class="about-content">
+      <div class="about-text slide-up">
+        <p class="about-description">
+          Budget Planner is a modern financial management tool that helps you take control of your spending.
+          Simply upload receipt images or enter expenses manually, and let our AI-powered system automatically
+          categorize and analyze your spending patterns.
+        </p>
+        <div class="benefits-grid">
+          <div class="benefit-item" *ngFor="let benefit of benefits">
+            <mat-icon class="benefit-icon">check_circle</mat-icon>
+            <span>{{ benefit }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="about-stats slide-up">
+        <div class="stat-card">
+          <div class="stat-number">10,000+</div>
+          <div class="stat-text">Receipts Processed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">95%</div>
+          <div class="stat-text">Accuracy Rate</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number">$2M+</div>
+          <div class="stat-text">Budget Tracked</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section id="how-it-works" class="how-it-works-section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">How It Works</h2>
+      <p class="section-subtitle">Four simple steps to better budget management</p>
+    </div>
+    <div class="steps-container">
+      <div class="step-card slide-up" *ngFor="let step of howItWorks" [style.animation-delay.ms]="step.step * 100">
+        <div class="step-number">{{ step.step }}</div>
+        <mat-icon class="step-icon">{{ step.icon }}</mat-icon>
+        <h3 class="step-title">{{ step.title }}</h3>
+        <p class="step-description">{{ step.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features-section">
+  <div class="container">
+    <div class="section-header fade-in">
+      <h2 class="section-title">Powerful Features</h2>
+      <p class="section-subtitle">Everything you need to manage your finances effectively</p>
+    </div>
+    <div class="features-grid">
+      <mat-card class="feature-card scale-in" *ngFor="let feature of features" [style.animation-delay.ms]="features.indexOf(feature) * 100">
+        <div class="feature-icon-wrapper" [style.background-color]="feature.color + '15'">
+          <mat-icon class="feature-icon" [style.color]="feature.color">{{ feature.icon }}</mat-icon>
+        </div>
+        <mat-card-header>
+          <mat-card-title>{{ feature.title }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>{{ feature.description }}</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</section>
+
+<!-- Why Budget Planner Section -->
+<section class="why-section">
+  <div class="container">
+    <div class="why-content">
+      <div class="why-text slide-up">
+        <h2 class="section-title">Why Budget Planner?</h2>
+        <div class="why-points">
+          <div class="why-point">
+            <mat-icon>speed</mat-icon>
+            <div>
+              <h4>Easy to Use</h4>
+              <p>Intuitive interface designed for speed and simplicity</p>
+            </div>
+          </div>
+          <div class="why-point">
+            <mat-icon>smart_toy</mat-icon>
+            <div>
+              <h4>Intelligent</h4>
+              <p>AI-powered categorization and personalized suggestions</p>
+            </div>
+          </div>
+          <div class="why-point">
+            <mat-icon>verified</mat-icon>
+            <div>
+              <h4>Comprehensive</h4>
+              <p>Multiple budgets with flexible time periods and categories</p>
+            </div>
+          </div>
+          <div class="why-point">
+            <mat-icon>visibility</mat-icon>
+            <div>
+              <h4>Visual</h4>
+              <p>Beautiful charts that make spending patterns crystal clear</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="why-visual slide-up">
+        <div class="visual-card">
+          <div class="chart-placeholder">
+            <mat-icon class="chart-icon">pie_chart</mat-icon>
+            <div class="chart-legend">
+              <div class="legend-item">
+                <div class="legend-color" style="background: #2563eb"></div>
+                <span>Groceries 35%</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #8b5cf6"></div>
+                <span>Dining 25%</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #ec4899"></div>
+                <span>Transport 20%</span>
+              </div>
+              <div class="legend-item">
+                <div class="legend-color" style="background: #10b981"></div>
+                <span>Other 20%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section">
+  <div class="container">
+    <div class="cta-content fade-in">
+      <h2 class="cta-title">Ready to Take Control of Your Budget?</h2>
+      <p class="cta-subtitle">Join thousands of users who are managing their finances smarter</p>
+      <button mat-raised-button class="btn-cta" (click)="navigateToRegister()">
+        Get Started Now
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-content">
+      <div class="footer-section">
+        <div class="footer-logo">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <span>Budget Planner</span>
+        </div>
+        <p class="footer-description">
+          Smart budget tracking made simple with AI-powered insights
+        </p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <a (click)="scrollToSection('about')">About</a>
+        <a (click)="scrollToSection('features')">Features</a>
+        <a (click)="scrollToSection('how-it-works')">How It Works</a>
+      </div>
+      <div class="footer-section">
+        <h4>Get Started</h4>
+        <a (click)="navigateToLogin()">Login</a>
+        <a (click)="navigateToRegister()">Sign Up</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 Budget Planner. All rights reserved.</p>
+    </div>
+  </div>
+</footer>

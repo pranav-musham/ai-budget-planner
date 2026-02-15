@@ -1,0 +1,66 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.5.10'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.receiptscan'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Spring Boot Core
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Security & JWT
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+    runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+    // Database
+    implementation 'org.postgresql:postgresql'
+    implementation 'org.flywaydb:flyway-core'
+    implementation 'org.flywaydb:flyway-database-postgresql'
+
+    // Cloudinary (for image storage)
+    implementation 'com.cloudinary:cloudinary-http44:1.36.0'
+
+    // Tesseract OCR
+    implementation 'net.sourceforge.tess4j:tess4j:5.9.0'
+
+    // Google Gemini AI (using HTTP client)
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    // Environment variables from .env file
+    implementation 'me.paulschwarz:spring-dotenv:4.0.0'
+
+    // Lombok
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    // Testing
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.springframework.security:spring-security-test'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}

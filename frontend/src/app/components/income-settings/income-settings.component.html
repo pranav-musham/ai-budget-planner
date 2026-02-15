@@ -1,0 +1,173 @@
+<div class="income-settings-container">
+  <div class="page-header">
+    <h1 class="page-title">Income</h1>
+    <div class="total-income-card">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <div class="income-info">
+        <span class="income-label">This Month's Income</span>
+        <span class="income-amount">${{ totalMonthlyIncome | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add/Edit Income Entry -->
+  <mat-card class="settings-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>{{ editingIncome ? 'edit' : 'add_circle' }}</mat-icon>
+        {{ editingIncome ? 'Edit Income Entry' : 'Add Income Entry' }}
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="incomeForm" (ngSubmit)="onSubmit()">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Income Source</mat-label>
+            <input matInput formControlName="sourceName" placeholder="e.g., Salary, Freelance, Side Gig">
+            <mat-icon matPrefix>work</mat-icon>
+            <mat-error *ngIf="incomeForm.get('sourceName')?.hasError('required')">
+              Source name is required
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Amount</mat-label>
+            <input matInput type="number" formControlName="amount" placeholder="5000" min="0.01" step="0.01">
+            <mat-icon matPrefix>attach_money</mat-icon>
+            <mat-error *ngIf="incomeForm.get('amount')?.hasError('required')">
+              Amount is required
+            </mat-error>
+            <mat-error *ngIf="incomeForm.get('amount')?.hasError('min')">
+              Amount must be greater than 0
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Date Received</mat-label>
+            <input matInput [matDatepicker]="datePicker" formControlName="transactionDate">
+            <mat-datepicker-toggle matSuffix [for]="datePicker"></mat-datepicker-toggle>
+            <mat-datepicker #datePicker></mat-datepicker>
+            <mat-icon matPrefix>event</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Payment Method</mat-label>
+            <mat-select formControlName="paymentMethod">
+              <mat-option *ngFor="let method of paymentMethods" [value]="method">
+                {{ method }}
+              </mat-option>
+            </mat-select>
+            <mat-icon matPrefix>payment</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="form-field full-width">
+            <mat-label>Notes (Optional)</mat-label>
+            <textarea matInput formControlName="notes" rows="2" placeholder="Any additional details..."></textarea>
+            <mat-icon matPrefix>notes</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="button-group">
+          <button mat-raised-button color="primary" type="submit" [disabled]="incomeForm.invalid">
+            <mat-icon>{{ editingIncome ? 'save' : 'add' }}</mat-icon>
+            {{ editingIncome ? 'Update Entry' : 'Add Income' }}
+          </button>
+          <button mat-button type="button" *ngIf="editingIncome" (click)="resetForm()">
+            <mat-icon>cancel</mat-icon>
+            Cancel
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && incomeSources.length === 0" class="empty-state">
+    <mat-icon>money_off</mat-icon>
+    <p>No income entries yet.</p>
+    <p class="empty-hint">Add your salary, freelance payments, or other earnings above to track your income.</p>
+  </div>
+
+  <!-- Monthly Grouped Income Entries -->
+  <div *ngIf="!isLoading && monthGroups.length > 0" class="month-groups">
+    <div *ngFor="let group of monthGroups" class="month-section">
+
+      <!-- Month Header (clickable to collapse/expand) -->
+      <div class="month-header" (click)="toggleMonth(group.key)">
+        <div class="month-header-left">
+          <mat-icon class="collapse-icon" [class.collapsed]="isCollapsed(group.key)">expand_more</mat-icon>
+          <div class="month-label">
+            <h2>{{ group.label }}</h2>
+            <span class="month-count">{{ group.entries.length }} entr{{ group.entries.length !== 1 ? 'ies' : 'y' }}</span>
+          </div>
+        </div>
+        <div class="month-total">
+          <span class="total-label">Total Income</span>
+          <span class="total-amount">${{ group.total | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+      <!-- Expandable Content -->
+      <div class="month-content" [class.collapsed]="isCollapsed(group.key)">
+
+        <!-- Source Breakdown -->
+        <div class="source-summary">
+          <div *ngFor="let src of group.sourceBreakdown" class="source-pill"
+               [style.border-left-color]="getSourceColor(src.source)">
+            <mat-icon class="source-pill-icon" [style.color]="getSourceColor(src.source)">
+              {{ getSourceIcon(src.source) }}
+            </mat-icon>
+            <div class="source-pill-info">
+              <span class="source-pill-name">{{ src.source }}</span>
+              <span class="source-pill-amount">${{ src.amount | number:'1.2-2' }}</span>
+            </div>
+            <span class="source-pill-pct">{{ src.percentage | number:'1.0-0' }}%</span>
+          </div>
+        </div>
+
+        <!-- Income Entries Table -->
+        <div class="income-table-wrapper">
+          <table class="income-entries-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Source</th>
+                <th>Payment Method</th>
+                <th class="text-right">Amount</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let income of group.entries" class="income-row">
+                <td class="date-cell">{{ income.transactionDate | date:'MMM d' }}</td>
+                <td class="source-cell">
+                  <mat-icon class="source-cell-icon" [style.color]="getSourceColor(income.sourceName)">
+                    {{ getSourceIcon(income.sourceName) }}
+                  </mat-icon>
+                  {{ income.sourceName }}
+                </td>
+                <td class="method-cell">
+                  <span class="method-tag">{{ income.paymentMethod || 'N/A' }}</span>
+                </td>
+                <td class="amount-cell">${{ income.amount | number:'1.2-2' }}</td>
+                <td class="actions-cell">
+                  <button mat-icon-button (click)="editIncome(income)" matTooltip="Edit">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                  <button mat-icon-button color="warn" (click)="deleteIncome(income)" matTooltip="Delete">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
