@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { IncomeSource, CreateIncomeRequest } from '../models/income.model';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class IncomeService {
-  private apiUrl = 'http://localhost:8080/api/income';
+  private apiUrl = `${environment.apiUrl}/income`;
 
   constructor(private http: HttpClient) {}
 
