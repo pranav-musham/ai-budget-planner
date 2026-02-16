@@ -1,4 +1,4 @@
-1-- Receipt Scanner - Initial Database Schema
+-- Receipt Scanner - Initial Database Schema
 -- Week 1, Day 2-3: PostgreSQL Setup
 
 -- Users table
