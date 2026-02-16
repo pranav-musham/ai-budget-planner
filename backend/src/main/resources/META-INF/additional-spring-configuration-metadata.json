@@ -10,6 +10,12 @@
       "type": "java.lang.Long",
       "description": "JWT token expiration time in milliseconds.",
       "defaultValue": 86400000
+    },
+    {
+      "name": "cors.allowed-origins",
+      "type": "java.lang.String",
+      "description": "Comma-separated list of allowed CORS origins.",
+      "defaultValue": "http://localhost:4200"
     }
   ]
 }
