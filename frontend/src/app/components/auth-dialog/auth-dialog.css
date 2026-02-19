@@ -26,7 +26,8 @@
 
 mat-dialog-content {
   padding: 0 !important;
-  overflow: hidden;
+  overflow-y: auto;
+  max-height: 70vh;
 }
 
 .auth-tabs {
@@ -86,7 +87,7 @@ mat-dialog-content {
 }
 
 ::ng-deep .auth-tabs .mat-mdc-tab-body-content {
-  overflow: hidden;
+  overflow-y: auto;
 }
 
 /* Responsive */
