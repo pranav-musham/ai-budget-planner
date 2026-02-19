@@ -51,7 +51,7 @@ public class GlobalExceptionHandler {
 
     private Map<String, Object> createErrorResponse(String message, HttpStatus status) {
         Map<String, Object> response = new HashMap<>();
-        response.put("error", message);
+        response.put("message", message);
         response.put("status", status.value());
         response.put("timestamp", LocalDateTime.now());
         return response;
