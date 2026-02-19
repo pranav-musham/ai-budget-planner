@@ -3,6 +3,7 @@ package com.receiptscan.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -17,11 +18,21 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    @Value("${jwt.secret:your-super-secret-jwt-key-that-is-at-least-256-bits-long-for-hs256}")
+    private static final String FALLBACK_SECRET =
+            "your-super-secret-jwt-key-that-is-at-least-256-bits-long-for-hs256";
+
+    @Value("${jwt.secret:}")
     private String secret;
 
     @Value("${jwt.expiration:86400000}") // 24 hours in milliseconds
     private Long expiration;
+
+    @PostConstruct
+    public void init() {
+        if (secret == null || secret.trim().isEmpty()) {
+            secret = FALLBACK_SECRET;
+        }
+    }
 
     private SecretKey getSigningKey() {
         byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
