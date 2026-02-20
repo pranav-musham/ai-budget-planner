@@ -38,8 +38,4 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
         @Param("endDate") LocalDate endDate
     );
 
-    @Query("SELECT t FROM Transaction t WHERE t.userId = :userId AND t.isRecurring = true ORDER BY t.transactionDate DESC")
-    List<Transaction> findRecurringByUserId(@Param("userId") Long userId);
-
-    List<Transaction> findByRecurringExpenseId(Long recurringExpenseId);
 }
