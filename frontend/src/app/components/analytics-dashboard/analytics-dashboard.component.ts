@@ -508,10 +508,6 @@ export class AnalyticsDashboardComponent implements OnInit, AfterViewInit, OnDes
     this.router.navigate(['/transactions']);
   }
 
-  navigateToBudgets(): void {
-    this.router.navigate(['/budgets/settings']);
-  }
-
   getCategoryColor(category: string): string {
     const colors: { [key: string]: string } = {
       'Groceries': '#2563eb',

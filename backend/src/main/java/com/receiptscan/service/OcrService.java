@@ -10,7 +10,6 @@ import jakarta.annotation.PostConstruct;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -78,32 +77,6 @@ public class OcrService {
         log.debug("Extracted text preview: {}",
             text.length() > 100 ? text.substring(0, 100) + "..." : text);
 
-        return text;
-    }
-
-    /**
-     * Extract text from local file
-     */
-    public String extractTextFromFile(File file) throws TesseractException, IOException {
-        log.info("Extracting text from file: {}", file.getName());
-
-        // Read image
-        BufferedImage image = ImageIO.read(file);
-
-        if (image == null) {
-            throw new IOException("Failed to read image from file: " + file.getName());
-        }
-
-        // Preprocess image
-        image = preprocessImage(image);
-
-        // Extract text
-        String text = tesseract.doOCR(image);
-
-        // Clean up text
-        text = cleanupText(text);
-
-        log.info("Extracted {} characters from file", text.length());
         return text;
     }
 
@@ -183,16 +156,4 @@ public class OcrService {
         return cleaned.toString().trim();
     }
 
-    /**
-     * Get OCR confidence (0-100)
-     * Note: This requires additional Tesseract API calls
-     */
-    public int getConfidence(File file) {
-        try {
-            return tesseract.doOCR(file).length() > 0 ? 85 : 0; // Simplified confidence
-        } catch (Exception e) {
-            log.error("Error calculating OCR confidence", e);
-            return 0;
-        }
-    }
 }

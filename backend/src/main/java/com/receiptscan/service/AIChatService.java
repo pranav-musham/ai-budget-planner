@@ -3,10 +3,8 @@ package com.receiptscan.service;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.receiptscan.entity.Budget;
 import com.receiptscan.entity.ChatMessage;
 import com.receiptscan.entity.Transaction;
-import com.receiptscan.repository.BudgetRepository;
 import com.receiptscan.repository.ChatMessageRepository;
 import com.receiptscan.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +46,6 @@ public class AIChatService {
 
     private final ChatMessageRepository chatMessageRepository;
     private final TransactionRepository transactionRepository;
-    private final BudgetRepository budgetRepository;
     private final HttpClient httpClient = HttpClient.newHttpClient();
     private final Gson gson = new Gson();
 
@@ -164,15 +161,6 @@ public class AIChatService {
             ));
         context.put("categoryBreakdown", categorySpending);
 
-        // Get user's budgets
-        List<Budget> budgets = budgetRepository.findByUserId(userId);
-        Map<String, Object> budgetInfo = budgets.stream()
-            .collect(Collectors.toMap(
-                Budget::getCategory,
-                b -> String.format("$%.2f %s", b.getLimitAmount(), b.getPeriodType())
-            ));
-        context.put("budgets", budgetInfo);
-
         // Transaction count
         context.put("transactionCount", transactions.size());
 
@@ -231,16 +219,6 @@ public class AIChatService {
             prompt.append("\nSpending by category:\n");
             categoryBreakdown.forEach((category, amount) ->
                 prompt.append(String.format("  - %s: $%.2f\n", category, amount))
-            );
-        }
-
-        // Budget information
-        @SuppressWarnings("unchecked")
-        Map<String, Object> budgets = (Map<String, Object>) context.get("budgets");
-        if (budgets != null && !budgets.isEmpty()) {
-            prompt.append("\nUser's budgets:\n");
-            budgets.forEach((category, budget) ->
-                prompt.append(String.format("  - %s: %s\n", category, budget))
             );
         }
 
