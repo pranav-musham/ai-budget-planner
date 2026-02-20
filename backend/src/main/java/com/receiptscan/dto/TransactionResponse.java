@@ -37,10 +37,6 @@ public class TransactionResponse {
 
     private String notes;
 
-    private Boolean isRecurring;
-
-    private Long recurringExpenseId;
-
     private List<LineItemResponse> items;
 
     private BigDecimal confidenceScore;

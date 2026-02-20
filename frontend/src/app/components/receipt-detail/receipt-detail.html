@@ -48,7 +48,6 @@
             <mat-chip [class.manual-chip]="transaction.isManualEntry">
               {{ transaction.isManualEntry ? 'Manual' : 'AI Parsed' }}
             </mat-chip>
-            <mat-chip *ngIf="transaction.isRecurring" class="recurring-chip">Recurring</mat-chip>
           </mat-chip-set>
         </div>
 

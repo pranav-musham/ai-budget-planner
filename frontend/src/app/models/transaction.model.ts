@@ -15,8 +15,6 @@ export interface Transaction {
   category: string;
   paymentMethod?: string;
   notes?: string;
-  isRecurring?: boolean;
-  recurringExpenseId?: number;
   items?: LineItem[];
   confidenceScore?: number;
   isManualEntry?: boolean;
@@ -32,8 +30,6 @@ export interface CreateTransactionRequest {
   category: string;
   paymentMethod?: string;
   notes?: string;
-  isRecurring?: boolean;
-  recurringExpenseId?: number;
   items?: LineItemRequest[];
 }
 

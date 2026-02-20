@@ -1,7 +1,6 @@
 package com.receiptscan.service;
 
 import com.receiptscan.dto.*;
-import com.receiptscan.entity.BudgetAlert;
 import com.receiptscan.entity.Transaction;
 import com.receiptscan.exception.BadRequestException;
 import com.receiptscan.exception.NotFoundException;
@@ -42,9 +41,6 @@ public class TransactionService {
 
     @Autowired(required = false)
     private GeminiReceiptParserService geminiParser;
-
-    @Autowired(required = false)
-    private BudgetAlertService budgetAlertService;
 
     // ==================== OCR PROCESSING ====================
 
@@ -107,9 +103,6 @@ public class TransactionService {
         // Step 5: Save to database
         Transaction saved = transactionRepository.save(transaction);
         log.info("Transaction saved with ID: {}", saved.getId());
-
-        // Step 6: Check budget alerts
-        checkBudgetAlert(userId, saved.getCategory());
 
         return convertToResponse(saved);
     }
@@ -270,14 +263,10 @@ public class TransactionService {
                 .items(items)
                 .paymentMethod(request.getPaymentMethod())
                 .notes(request.getNotes())
-                .isRecurring(request.getIsRecurring() != null && request.getIsRecurring())
-                .recurringExpenseId(request.getRecurringExpenseId())
                 .build();
 
         Transaction saved = transactionRepository.save(transaction);
         log.info("Transaction created successfully with ID: {}", saved.getId());
-
-        checkBudgetAlert(userId, saved.getCategory());
 
         return convertToResponse(saved);
     }
@@ -478,16 +467,6 @@ public class TransactionService {
     }
 
     // ==================== HELPER METHODS ====================
-
-    private void checkBudgetAlert(Long userId, String category) {
-        if (budgetAlertService != null) {
-            try {
-                budgetAlertService.checkAndCreateAlert(userId, category, BudgetAlert.AlertType.REAL_TIME);
-            } catch (Exception e) {
-                log.warn("Failed to check budget alert: {}", e.getMessage());
-            }
-        }
-    }
 
     private String extractMerchantName(String text) {
         String[] lines = text.split("\n");
@@ -763,8 +742,6 @@ public class TransactionService {
                 .items(itemResponses)
                 .paymentMethod(transaction.getPaymentMethod())
                 .notes(transaction.getNotes())
-                .isRecurring(transaction.getIsRecurring())
-                .recurringExpenseId(transaction.getRecurringExpenseId())
                 .confidenceScore(transaction.getConfidenceScore())
                 .isManualEntry(transaction.isManualEntry())
                 .needsReview(needsReview)

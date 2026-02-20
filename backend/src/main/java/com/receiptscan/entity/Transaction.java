@@ -60,13 +60,6 @@ public class Transaction {
     @Column(columnDefinition = "TEXT")
     private String notes;
 
-    @Column(name = "is_recurring")
-    @Builder.Default
-    private Boolean isRecurring = false;
-
-    @Column(name = "recurring_expense_id")
-    private Long recurringExpenseId;
-
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

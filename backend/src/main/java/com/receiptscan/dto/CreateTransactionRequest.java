@@ -43,10 +43,6 @@ public class CreateTransactionRequest {
     @Size(max = 500, message = "Notes must be at most 500 characters")
     private String notes;
 
-    private Boolean isRecurring;
-
-    private Long recurringExpenseId;
-
     @Valid
     private List<LineItemRequest> items;
 }
