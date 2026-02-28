@@ -13,6 +13,16 @@
       <div *ngIf="processedTransactions.length === 0" class="upload-tab-content">
         <mat-card>
           <mat-card-content>
+            <!-- Hidden file input always in DOM so ViewChild reference is never lost -->
+            <input
+              #fileInput
+              type="file"
+              accept="image/*"
+              multiple
+              (change)="onFileSelected($event)"
+              style="display: none"
+            />
+
             <!-- Drag & Drop Zone -->
             <div
               class="drop-zone"
@@ -27,14 +37,6 @@
               <div *ngIf="selectedFiles.length === 0">
                 <p class="drop-text">Drag and drop receipt images here</p>
                 <p class="or-text">or</p>
-                <input
-                  #fileInput
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  (change)="onFileSelected($event)"
-                  style="display: none"
-                />
                 <button mat-raised-button color="primary" (click)="triggerFileInput()">
                   <mat-icon>folder_open</mat-icon>
                   Browse Files

@@ -16,6 +16,44 @@
       "type": "java.lang.String",
       "description": "Comma-separated list of allowed CORS origins.",
       "defaultValue": "http://localhost:4200"
+    },
+    {
+      "name": "cloudinary.cloud-name",
+      "type": "java.lang.String",
+      "description": "Cloudinary cloud name for image storage."
+    },
+    {
+      "name": "cloudinary.api-key",
+      "type": "java.lang.String",
+      "description": "Cloudinary API key."
+    },
+    {
+      "name": "cloudinary.api-secret",
+      "type": "java.lang.String",
+      "description": "Cloudinary API secret."
+    },
+    {
+      "name": "tesseract.datapath",
+      "type": "java.lang.String",
+      "description": "Path to the Tesseract tessdata directory.",
+      "defaultValue": "/opt/homebrew/share/tessdata"
+    },
+    {
+      "name": "tesseract.jna.library.path",
+      "type": "java.lang.String",
+      "description": "JNA library path for the Tesseract native library. Leave empty to use system library path.",
+      "defaultValue": "/opt/homebrew/lib"
+    },
+    {
+      "name": "gemini.api.key",
+      "type": "java.lang.String",
+      "description": "Google Gemini API key."
+    },
+    {
+      "name": "gemini.api.model",
+      "type": "java.lang.String",
+      "description": "Google Gemini model name to use.",
+      "defaultValue": "gemini-2.5-flash"
     }
   ]
 }

@@ -8,6 +8,8 @@ RUN ./gradlew bootJar --no-daemon
 
 FROM eclipse-temurin:21-jre
 RUN apt-get update && apt-get install -y tesseract-ocr && rm -rf /var/lib/apt/lists/*
+ENV TESSDATA_PATH=/usr/share/tesseract-ocr/4.00/tessdata
+ENV TESSERACT_LIB_PATH=
 WORKDIR /app
 COPY --from=build /app/build/libs/*.jar app.jar
 EXPOSE 8080

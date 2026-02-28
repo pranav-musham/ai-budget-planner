@@ -18,9 +18,6 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private static final String FALLBACK_SECRET =
-            "your-super-secret-jwt-key-that-is-at-least-256-bits-long-for-hs256";
-
     @Value("${jwt.secret:}")
     private String secret;
 
@@ -30,7 +27,7 @@ public class JwtUtil {
     @PostConstruct
     public void init() {
         if (secret == null || secret.trim().isEmpty()) {
-            secret = FALLBACK_SECRET;
+            throw new IllegalStateException("JWT_SECRET environment variable must be set");
         }
     }
 

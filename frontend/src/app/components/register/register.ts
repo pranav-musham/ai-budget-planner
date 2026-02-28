@@ -71,7 +71,7 @@ export class RegisterComponent {
     this.authService.register({ email, password, fullName }).subscribe({
       next: () => {
         this.isLoading = false;
-        this.router.navigate(['/receipts']);
+        this.router.navigate(['/transactions']);
       },
       error: (error) => {
         this.isLoading = false;

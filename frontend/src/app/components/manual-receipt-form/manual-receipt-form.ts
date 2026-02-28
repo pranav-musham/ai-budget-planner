@@ -224,6 +224,8 @@ export class ManualReceiptForm implements OnInit {
     if (input.files && input.files.length > 0) {
       this.handleFiles(Array.from(input.files));
     }
+    // Reset so selecting the same file again fires the change event
+    input.value = '';
   }
 
   handleFiles(files: File[]): void {

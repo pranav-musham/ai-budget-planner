@@ -3,6 +3,7 @@ package com.receiptscan.service;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.tess4j.Tesseract;
 import net.sourceforge.tess4j.TesseractException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -18,31 +19,28 @@ import java.net.URISyntaxException;
 @Slf4j
 public class OcrService {
 
+    @Value("${tesseract.datapath:/opt/homebrew/share/tessdata}")
+    private String tessDataPath;
+
+    @Value("${tesseract.jna.library.path:/opt/homebrew/lib}")
+    private String jnaLibraryPath;
+
     private Tesseract tesseract;
 
     @PostConstruct
     public void init() {
-        // Set JNA library path for Tesseract native library (macOS Homebrew)
-        System.setProperty("jna.library.path", "/opt/homebrew/lib");
-        log.info("JNA library path set to: /opt/homebrew/lib");
+        if (!jnaLibraryPath.isBlank()) {
+            System.setProperty("jna.library.path", jnaLibraryPath);
+            log.info("JNA library path set to: {}", jnaLibraryPath);
+        }
 
         tesseract = new Tesseract();
-
-        // Set tessdata path (Homebrew installation on macOS)
-        tesseract.setDatapath("/opt/homebrew/share/tessdata");
-
-        // Set language (English)
+        tesseract.setDatapath(tessDataPath);
         tesseract.setLanguage("eng");
-
-        // Page segmentation mode: Assume a single uniform block of text
         tesseract.setPageSegMode(1); // Automatic page segmentation with OSD
+        tesseract.setOcrEngineMode(1); // LSTM neural net
 
-        // OCR Engine Mode: Use LSTM neural net
-        tesseract.setOcrEngineMode(1);
-
-        log.info("Tesseract OCR initialized successfully");
-        log.info("Tessdata path: /opt/homebrew/share/tessdata");
-        log.info("Language: eng");
+        log.info("Tesseract OCR initialized - tessdata: {}, language: eng", tessDataPath);
     }
 
     /**
@@ -81,10 +79,11 @@ public class OcrService {
     }
 
     /**
-     * Preprocess image for better OCR accuracy
-     * - Scale up small images (Tesseract works better with larger images)
-     * - Convert to grayscale
-     * - Apply binarization for cleaner text
+     * Preprocess image for better OCR accuracy:
+     * 1. Scale up small images
+     * 2. Convert to grayscale
+     * 3. Binarize — then invert if the image has a dark background (dark-mode screenshots),
+     *    since Tesseract requires black text on white background.
      */
     private BufferedImage preprocessImage(BufferedImage original) {
         log.debug("Preprocessing image: {}x{}", original.getWidth(), original.getHeight());
@@ -112,7 +111,7 @@ public class OcrService {
         g2d.drawImage(scaled, 0, 0, null);
         g2d.dispose();
 
-        // Step 3: Binarize for cleaner text (black text on white background)
+        // Step 3: Binarize
         BufferedImage binarized = new BufferedImage(
             grayscale.getWidth(),
             grayscale.getHeight(),
@@ -122,28 +121,41 @@ public class OcrService {
         g2dBin.drawImage(grayscale, 0, 0, null);
         g2dBin.dispose();
 
-        log.debug("Image preprocessed: scaled + grayscale + binarized");
+        // Step 4: If dark-mode image (>50% dark pixels), invert so text is black on white.
+        // Tesseract requires black text on white background — dark-mode screenshots are the opposite.
+        int totalPixels = binarized.getWidth() * binarized.getHeight();
+        int darkPixels = 0;
+        for (int x = 0; x < binarized.getWidth(); x++) {
+            for (int y = 0; y < binarized.getHeight(); y++) {
+                if ((binarized.getRGB(x, y) & 0xFF) == 0) {
+                    darkPixels++;
+                }
+            }
+        }
+        if (darkPixels > totalPixels / 2) {
+            log.debug("Dark-mode image detected ({}/{} dark pixels) — inverting for Tesseract", darkPixels, totalPixels);
+            for (int x = 0; x < binarized.getWidth(); x++) {
+                for (int y = 0; y < binarized.getHeight(); y++) {
+                    binarized.setRGB(x, y, ~binarized.getRGB(x, y));
+                }
+            }
+        }
+
+        log.debug("Image preprocessed: scaled + grayscale + binarized (dark-mode-aware)");
         return binarized;
     }
 
     /**
      * Clean up extracted text
-     * - Remove extra whitespace
-     * - Normalize line breaks
-     * - Trim leading/trailing spaces
      */
     private String cleanupText(String text) {
         if (text == null || text.isEmpty()) {
             return "";
         }
 
-        // Replace multiple spaces with single space
         text = text.replaceAll(" +", " ");
-
-        // Replace multiple line breaks with double line break
         text = text.replaceAll("\\n{3,}", "\n\n");
 
-        // Trim each line
         String[] lines = text.split("\\n");
         StringBuilder cleaned = new StringBuilder();
         for (String line : lines) {

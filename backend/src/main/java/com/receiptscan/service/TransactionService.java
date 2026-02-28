@@ -480,10 +480,12 @@ public class TransactionService {
             if (trimmed.matches(".*\\d{3}[-.\\s]\\d{3}[-.\\s]\\d{4}.*")) continue; // phone numbers
             if (trimmed.matches(".*\\d{5}(-\\d{4})?.*")) continue; // zip codes
             if (trimmed.toLowerCase().matches(".*(street|avenue|blvd|road|dr\\.|suite|ste|apt|floor).*")) continue;
-            if (trimmed.toLowerCase().matches("^(tel|fax|phone|date|time|cashier|server|table|order|receipt|register|terminal|store|#).*")) continue;
+            if (trimmed.toLowerCase().matches("^(tel|fax|phone|date|time|cashier|server|table|order|receipt|register|terminal|store|item|sales|#).*")) continue;
             if (trimmed.matches("^\\d{1,2}[/\\-]\\d{1,2}[/\\-]\\d{2,4}.*")) continue; // dates
             if (trimmed.matches("^\\$?\\d+\\.\\d{2}$")) continue; // standalone prices
-            if (trimmed.toLowerCase().matches("^(subtotal|total|tax|change|cash|credit|debit|visa|mastercard|amex).*")) continue;
+            if (trimmed.toLowerCase().matches("^(subtotal|total|tax|change|cash|credit|debit|visa|mastercard|amex|payment|summary|sbpg).*")) continue;
+            if (trimmed.matches(".*[xX×].*Receipt.*") || trimmed.matches(".*Receipt.*[xX×].*")) continue; // OCR noise from close button
+            if (!trimmed.matches(".*[a-zA-Z]{2,}.*")) continue; // must contain at least 2 consecutive letters
 
             candidates.add(trimmed);
             if (candidates.size() >= 3) break;
@@ -494,6 +496,17 @@ public class TransactionService {
             for (String candidate : candidates) {
                 if (candidate.equals(candidate.toUpperCase()) && candidate.matches(".*[A-Z]{3,}.*")) {
                     return candidate;
+                }
+            }
+            // Extract merchant name from URL (e.g. "www.kroger.com" → "Kroger")
+            for (String candidate : candidates) {
+                String lower = candidate.toLowerCase();
+                if (lower.contains("www.") || lower.matches(".*\\.[a-z]{2,3}$")) {
+                    String domain = lower.replaceAll("https?://", "").replaceAll("^www\\.", "");
+                    String name = domain.split("\\.")[0]; // take first segment before TLD
+                    if (name.length() >= 2) {
+                        return name.substring(0, 1).toUpperCase() + name.substring(1);
+                    }
                 }
             }
             return candidates.get(0);
@@ -532,13 +545,23 @@ public class TransactionService {
             }
         }
 
-        // Last resort: find the largest dollar amount in the text (likely the total)
-        Pattern dollarPattern = Pattern.compile("\\$?\\s*(\\d+[.,]\\d{2})");
+        // Last resort: find the largest dollar amount in the text (likely the total),
+        // but skip lines that represent cash/change tender (not the actual amount charged)
+        Pattern tenderLinePattern = Pattern.compile("(?i)^.*(\\bcash\\b|\\bchange\\b|\\btendered?\\b|\\bsbpg\\b).*$", Pattern.MULTILINE);
+        java.util.Set<String> tenderLines = new java.util.HashSet<>();
+        Matcher tenderMatcher = tenderLinePattern.matcher(text);
+        while (tenderMatcher.find()) {
+            tenderLines.add(tenderMatcher.group(0));
+        }
+
+        Pattern dollarPattern = Pattern.compile("(?m)^(.*)\\$?\\s*(\\d+[.,]\\d{2})(.*)$");
         Matcher matcher = dollarPattern.matcher(text);
         BigDecimal largest = BigDecimal.ZERO;
         while (matcher.find()) {
+            String line = matcher.group(0);
+            if (tenderLines.contains(line)) continue; // skip cash/change lines
             try {
-                BigDecimal val = new BigDecimal(normalizeDecimal(matcher.group(1)));
+                BigDecimal val = new BigDecimal(normalizeDecimal(matcher.group(2)));
                 if (val.compareTo(largest) > 0) {
                     largest = val;
                 }
@@ -614,10 +637,18 @@ public class TransactionService {
             String trimmed = line.trim();
             if (trimmed.isEmpty()) continue;
 
-            // Skip summary lines
-            if (trimmed.toLowerCase().matches("^(sub\\s*total|total|tax|grand total|change|balance|amount|paid|cash|credit|debit|visa|mastercard).*")) {
+            // Skip payment/summary lines
+            if (trimmed.toLowerCase().matches(
+                    "^(sub\\s*total|total|tax|sales\\s*tax|grand\\s*total|order\\s*total|change|balance|amount|paid|cash|credit|debit|visa|mastercard|amex|terminal|sbpg|payment|tender|item\\s*details?|payment\\s*details?).*")) {
                 continue;
             }
+            // Skip UPC lines
+            if (trimmed.toUpperCase().startsWith("UPC")) continue;
+            // Skip pure weight/quantity lines with no product name (e.g. "1 lb", "2.35 lbs")
+            if (trimmed.matches("(?i)^\\d+\\.?\\d*\\s*(lb|lbs|oz|kg|g)$")) continue;
+            // Skip quantity sub-lines like "1.0 x $3.50 ea." or "2.35 lbs x $3.29 ea."
+            // These are the unit-price rows that appear under the actual item name on grocery receipts
+            if (trimmed.matches("(?i)^\\d+\\.?\\d*\\s*(x|lbs?|oz|kg|units?|ea\\.?)\\s+.*")) continue;
 
             // Try quantity prefix pattern: "2x Item Name $12.34"
             Matcher qtyMatcher = Pattern.compile("(\\d+)\\s*[xX]\\s*(.+?)\\s+\\$?\\s*(\\d+[.,]\\d{2})").matcher(trimmed);
@@ -661,20 +692,23 @@ public class TransactionService {
         String lower = merchantName.toLowerCase();
 
         if (lower.contains("grocery") || lower.contains("market") ||
-            lower.contains("supermarket") || lower.contains("food")) {
+            lower.contains("supermarket") || lower.contains("kroger") ||
+            lower.contains("walmart") || lower.contains("costco") || lower.contains("trader")) {
             return "Groceries";
         } else if (lower.contains("coffee") || lower.contains("cafe") ||
                    lower.contains("restaurant") || lower.contains("pizza") ||
-                   lower.contains("burger") || lower.contains("diner")) {
-            return "Food";
+                   lower.contains("burger") || lower.contains("diner") ||
+                   lower.contains("kitchen") || lower.contains("grill") || lower.contains("sushi")) {
+            return "Dining";
         } else if (lower.contains("gas") || lower.contains("fuel") ||
-                   lower.contains("shell") || lower.contains("chevron")) {
-            return "Transport";
+                   lower.contains("shell") || lower.contains("chevron") ||
+                   lower.contains("uber") || lower.contains("lyft") || lower.contains("transit")) {
+            return "Transportation";
         } else if (lower.contains("pharmacy") || lower.contains("drug") ||
-                   lower.contains("cvs") || lower.contains("walgreens")) {
+                   lower.contains("cvs") || lower.contains("walgreens") || lower.contains("medical")) {
             return "Health";
         } else if (lower.contains("mall") || lower.contains("store") ||
-                   lower.contains("shop")) {
+                   lower.contains("shop") || lower.contains("target") || lower.contains("amazon")) {
             return "Shopping";
         } else {
             return "Other";
