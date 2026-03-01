@@ -88,11 +88,12 @@ public class OcrService {
     private BufferedImage preprocessImage(BufferedImage original) {
         log.debug("Preprocessing image: {}x{}", original.getWidth(), original.getHeight());
 
-        // Step 1: Scale up small images for better OCR accuracy
+        // Step 1: Scale up only very small images — capped at 1500px to avoid OOM on free-tier (512MB).
+        // Most phone/screenshot images are already 800px+ and don't need scaling.
         BufferedImage scaled = original;
-        if (original.getWidth() < 1500) {
-            int newWidth = original.getWidth() * 2;
-            int newHeight = original.getHeight() * 2;
+        if (original.getWidth() < 800) {
+            int newWidth = Math.min(original.getWidth() * 2, 1500);
+            int newHeight = (int) (original.getHeight() * ((double) newWidth / original.getWidth()));
             scaled = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_RGB);
             Graphics2D g2dScale = scaled.createGraphics();
             g2dScale.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);

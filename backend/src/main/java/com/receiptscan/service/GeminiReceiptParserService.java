@@ -187,7 +187,7 @@ public class GeminiReceiptParserService {
         config.addProperty("temperature", 0.1);
         config.addProperty("topP", 0.95);
         config.addProperty("topK", 40);
-        config.addProperty("maxOutputTokens", 2048);
+        config.addProperty("maxOutputTokens", 8192);
         // Force pure JSON output — prevents Gemini from wrapping the response in
         // markdown code blocks or adding explanatory text that breaks JSON parsing
         config.addProperty("responseMimeType", "application/json");
