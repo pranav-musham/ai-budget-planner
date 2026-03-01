@@ -15,7 +15,7 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: CORS_ALLOWED_ORIGINS
-        value: https://ai-budget-planner-xi.vercel.app,https://ai-budget-planner-git-main-pranav-sai-mushams-projects.vercel.app
+        value: https://ai-budget-planner-indol.vercel.app,https://ai-budget-planner-xi.vercel.app,https://ai-budget-planner-git-main-pranav-sai-mushams-projects.vercel.app
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
       - key: CLOUDINARY_API_KEY
